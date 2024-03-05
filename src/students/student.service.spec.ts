@@ -13,13 +13,9 @@ const student: Student = {
 describe('StudentService', () => {
   let service: StudentService;
 
-  const mockStudentModel = {
-    find: jest.fn(),
-    findOne: jest.fn(),
-    create: jest.fn(),
-    deleteMany: jest.fn(),
-    findByIdAndDelete: jest.fn(),
-  };
+  const mockStudentModel = function () {};
+  mockStudentModel.prototype.save = jest.fn();
+  mockStudentModel.findOne = jest.fn();
 
   const mockResultModel = {
     deleteMany: jest.fn(),
@@ -48,28 +44,25 @@ describe('StudentService', () => {
   });
 
   describe('createStudent', () => {
-    // it('should create a new student', async () => {
-    //   const student: Student = {
-    //     firstName: 'John',
-    //     familyName: 'Doe',
-    //     email: 'john.doe@example.com',
-    //     dateOfBirth: new Date('2002-01-01').toDateString(),
-    //   };
-    //
-    //   mockStudentModel.findOne.mockResolvedValue(null);
-    //   mockStudentModel.create.mockResolvedValue(student);
-    //
-    //   const studentModelMockSave = jest.fn().mockReturnValue(student);
-    //   new studentModel().save = studentModelMockSave;
-    //
-    //   const result = await service.createStudent(student);
-    //
-    //   expect(result).toEqual(student);
-    //   expect(mockStudentModel.findOne).toHaveBeenCalledWith({
-    //     email: student.email,
-    //   });
-    //   expect(mockStudentModel.create).toHaveBeenCalledWith(student);
-    // });
+    it('should create a new student', async () => {
+      const student: Student = {
+        firstName: 'John',
+        familyName: 'Doe',
+        email: 'john.doe@example.com',
+        dateOfBirth: new Date('2002-01-01').toDateString(),
+      };
+
+      mockStudentModel.findOne.mockResolvedValue(null);
+      mockStudentModel.prototype.save.mockResolvedValue(student);
+
+      const result = await service.createStudent(student);
+
+      expect(result).toEqual(student);
+      expect(mockStudentModel.findOne).toHaveBeenCalledWith({
+        email: student.email,
+      });
+      expect(mockStudentModel.prototype.save).toHaveBeenCalled();
+    });
 
     it('should throw an error if the student with the same email already exists', async () => {
       mockStudentModel.findOne.mockResolvedValue(student);

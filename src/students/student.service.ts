@@ -17,7 +17,6 @@ export class StudentService {
 
   async createStudent(student: Student): Promise<Student> {
     const studentExists = await this.studentModel.findOne({ email: student.email })
-    console.log(studentExists)
     if (studentExists) {
       throw new BadRequestException('Student with email already exists');
     }

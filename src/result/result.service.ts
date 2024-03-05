@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Result, ResultDocument } from './result.entity';
 import { StudentDocument } from '../students/student.entity';
 import { CourseDocument } from '../course/course.entity';
+import { ResultDto } from './result.dto';
 
 @Injectable()
 export class ResultService {
@@ -13,14 +14,14 @@ export class ResultService {
     @InjectModel('Course') private courseModel: Model<CourseDocument>,
   ) {}
 
-  async create(result: Result): Promise<Result> {
+  async create(result: ResultDto): Promise<Result> {
     const student = await this.studentModel.findById(result.student);
     if (!student) {
-      throw new Error('Student not found');
+      throw new BadRequestException('Student not found');
     }
     const course = await this.courseModel.findById(result.course);
     if (!course) {
-      throw new Error('Course not found');
+      throw new BadRequestException('Course not found');
     }
     const createdResult = new this.resultModel(result);
     return createdResult.save();

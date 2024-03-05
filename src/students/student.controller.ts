@@ -13,7 +13,6 @@ export class StudentController {
 
   @Post()
   async createStudent(@Body() student: Student) {
-    console.log(student);
     return this.studentService.createStudent(student);
   }
 
@@ -21,9 +20,4 @@ export class StudentController {
   async deleteStudent(@Param('id') id: string) {
     return this.studentService.deleteStudent(id);
   }
-
-  // @Put()
-  // async updateStudent(@Body() student: Student) {
-  //   return this.studentService.updateStudent(student);
-  // }
 }

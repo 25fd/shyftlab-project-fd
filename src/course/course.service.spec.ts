@@ -11,12 +11,11 @@ describe('CourseService', () => {
   let courseModel: Model<CourseDocument>;
   let resultModel: Model<ResultDocument>;
 
-  const mockCourseModel = {
-    findOne: jest.fn(),
-    create: jest.fn(),
-    findByIdAndDelete: jest.fn(),
-    find: jest.fn(),
-  };
+  const mockCourseModel = function () {};
+  mockCourseModel.findOne = jest.fn();
+  mockCourseModel.prototype.save = jest.fn();
+  mockCourseModel.findByIdAndDelete = jest.fn();
+  mockCourseModel.find = jest.fn();
 
   const mockResultModel = {
     deleteMany: jest.fn(),
@@ -47,22 +46,22 @@ describe('CourseService', () => {
   });
 
   describe('create', () => {
-    // it('should create a new course', async () => {
-    //   const course: Course = {
-    //     courseName: 'Math',
-    //   };
-    //
-    //   mockCourseModel.findOne.mockResolvedValue(null);
-    //   mockCourseModel.create.mockResolvedValue(course);
-    //
-    //   const result = await service.create(course);
-    //
-    //   expect(result).toEqual(course);
-    //   expect(mockCourseModel.findOne).toHaveBeenCalledWith({
-    //     courseName: course.courseName,
-    //   });
-    //   expect(mockCourseModel.create).toHaveBeenCalledWith(course);
-    // });
+    it('should create a new course', async () => {
+      const course: Course = {
+        courseName: 'Math',
+      };
+
+      mockCourseModel.findOne.mockResolvedValue(null);
+      mockCourseModel.prototype.save.mockResolvedValue(course);
+
+      const result = await service.create(course);
+
+      expect(result).toEqual(course);
+      expect(mockCourseModel.findOne).toHaveBeenCalledWith({
+        courseName: course.courseName,
+      });
+      expect(mockCourseModel.prototype.save).toHaveBeenCalled();
+    });
 
     it('should throw an error if the course already exists', async () => {
       const course: Course = {

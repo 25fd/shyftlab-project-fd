@@ -4,6 +4,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Result, ResultSchema, Score } from './result.entity';
 import { StudentSchema } from '../students/student.entity';
 import { CourseSchema } from '../course/course.entity';
+import { ResultController } from './result.controller';
 
 const student = {
   _id: 'student1',
@@ -23,11 +24,13 @@ const mockResults: Result[] = [
   },
 ];
 
-describe('ResultService', () => {
+describe('ResultController', () => {
   let service: ResultService;
+  let controller: ResultController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [ResultController],
       providers: [
         ResultService,
         {
@@ -46,6 +49,7 @@ describe('ResultService', () => {
     }).compile();
 
     service = module.get<ResultService>(ResultService);
+    controller = module.get<ResultController>(ResultController);
   });
 
   afterEach(() => {
@@ -53,28 +57,28 @@ describe('ResultService', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 
   describe('findAll', () => {
     it('should return an array of results', async () => {
       jest.spyOn(service, 'findAll').mockResolvedValue(mockResults);
 
-      expect(await service.findAll()).toBe(mockResults);
+      expect(await controller.findAll()).toBe(mockResults);
     });
   });
 
   describe('create', () => {
     it('should create a result', async () => {
-      const result: Result = {
-        student: student,
-        course: course,
+      const result = {
+        student: 'student1',
+        course: 'course1',
         score: Score.A,
       };
 
-      jest.spyOn(service, 'create').mockResolvedValue(result);
+      jest.spyOn(service, 'create').mockResolvedValue(mockResults[0]);
 
-      expect(await service.create(result)).toBe(result);
+      expect(await controller.create(result)).toBe(mockResults[0]);
     });
   });
 
@@ -83,7 +87,7 @@ describe('ResultService', () => {
       const id = '1';
       jest.spyOn(service, 'delete').mockResolvedValue(true);
 
-      expect(await service.delete(id)).toBe(true);
+      expect(await controller.delete(id)).toBe(true);
       expect(service.delete).toHaveBeenCalledWith(id);
     });
   });

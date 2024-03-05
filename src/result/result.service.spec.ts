@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ResultService } from './result.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Result } from './result.entity';
+import { BadRequestException } from '@nestjs/common';
 
 const student = {
   _id: 'student1',
@@ -21,22 +22,21 @@ const mockResults = [
   },
 ];
 
-const mockResultModel = {
-  find: jest.fn(() => ({
-    populate: jest
-      .fn(() => {
-        return {
-          populate: jest.fn(),
-          exec: jest.fn(),
-        };
-      })
-      .mockReturnThis(),
-    exec: jest.fn(),
-  })),
-  findById: jest.fn(),
-  findByIdAndDelete: jest.fn(),
-  save: jest.fn(),
-};
+const mockResultModel = function () {};
+mockResultModel.find = jest.fn(() => ({
+  populate: jest
+    .fn(() => {
+      return {
+        populate: jest.fn(),
+        exec: jest.fn(),
+      };
+    })
+    .mockReturnThis(),
+  exec: jest.fn(),
+}));
+mockResultModel.findById = jest.fn();
+mockResultModel.findByIdAndDelete = jest.fn();
+mockResultModel.prototype.save = jest.fn();
 
 const mockStudentModel = {
   findById: jest.fn(),
@@ -44,6 +44,11 @@ const mockStudentModel = {
 
 const mockCourseModel = {
   findById: jest.fn(),
+};
+const input = {
+  student: 'student1',
+  course: 'course1',
+  score: 'A',
 };
 
 describe('ResultService', () => {
@@ -79,78 +84,46 @@ describe('ResultService', () => {
     expect(service).toBeDefined();
   });
 
-  // describe('create', () => {
-  //   it('should create a result', async () => {
-  //     const mockResult = {
-  //       student: 'someStudentId',
-  //       course: 'someCourseId',
-  //       score: 'A',
-  //     };
-  //
-  //     const mockStudent = {
-  //       _id: 'someStudentId',
-  //     };
-  //
-  //     const mockCourse = {
-  //       _id: 'someCourseId',
-  //     };
-  //
-  //     mockStudentModel.findById.mockReturnValueOnce(mockStudent);
-  //     mockCourseModel.findById.mockReturnValueOnce(mockCourse);
-  //     mockResultModel.save.mockReturnValueOnce(mockResult);
-  //
-  //     const result = await service.create(mockResult);
-  //
-  //     expect(mockStudentModel.findById).toHaveBeenCalledWith('someStudentId');
-  //     expect(mockCourseModel.findById).toHaveBeenCalledWith('someCourseId');
-  //     expect(mockResultModel.save).toHaveBeenCalledWith(mockResult);
-  //     expect(result).toEqual(mockResult);
-  //   });
-  //
-  //   it('should throw an error if student not found', async () => {
-  //     const mockResult = {
-  //       student: 'nonExistentStudentId',
-  //       course: 'someCourseId',
-  //       // other fields
-  //     };
-  //
-  //     mockStudentModel.findById.mockReturnValueOnce(null);
-  //
-  //     await expect(service.create(mockResult)).rejects.toThrowError(
-  //       'Student not found',
-  //     );
-  //     expect(mockStudentModel.findById).toHaveBeenCalledWith(
-  //       'nonExistentStudentId',
-  //     );
-  //     expect(mockCourseModel.findById).not.toHaveBeenCalled();
-  //     expect(mockResultModel.save).not.toHaveBeenCalled();
-  //   });
-  //
-  //   it('should throw an error if course not found', async () => {
-  //     const mockResult = {
-  //       student: 'someStudentId',
-  //       course: 'nonExistentCourseId',
-  //       // other fields
-  //     };
-  //
-  //     const mockStudent = {
-  //       _id: 'someStudentId',
-  //       // other fields
-  //     };
-  //
-  //     mockStudentModel.findById.mockReturnValueOnce(mockStudent);
-  //     mockCourseModel.findById.mockReturnValueOnce(null);
-  //
-  //     await expect(service.create(mockResult)).rejects.toThrowError(
-  //       'Course not found',
-  //     );
-  //     expect(mockStudentModel.findById).toHaveBeenCalledWith('someStudentId');
-  //     expect(mockCourseModel.findById).toHaveBeenCalledWith(
-  //       'nonExistentCourseId',
-  //     );
-  //     expect(mockResultModel.save).not.toHaveBeenCalled();
-  //   });
-  // });
+  describe('create', () => {
+    it('should create a result', async () => {
+      mockStudentModel.findById.mockReturnValueOnce(student);
+      mockCourseModel.findById.mockReturnValueOnce(course);
+      mockResultModel.prototype.save.mockReturnValueOnce(mockResults[0]);
+
+      const result = await service.create(input);
+
+      expect(mockStudentModel.findById).toHaveBeenCalledWith('student1');
+      expect(mockCourseModel.findById).toHaveBeenCalledWith('course1');
+      expect(mockResultModel.prototype.save).toHaveBeenCalled();
+      expect(result).toEqual(mockResults[0]);
+    });
+
+    it('should throw an error if student not found', async () => {
+      mockStudentModel.findById.mockReturnValueOnce(null);
+      try {
+        await service.create(input);
+      } catch (error) {
+        expect(mockStudentModel.findById).toHaveBeenCalledWith('student1');
+        expect(mockCourseModel.findById).not.toHaveBeenCalled();
+        expect(mockResultModel.prototype.save).not.toHaveBeenCalled();
+        expect(error).toBeInstanceOf(BadRequestException);
+      }
+    });
+
+    it('should throw an error if course not found', async () => {
+      mockStudentModel.findById.mockReturnValueOnce(student);
+      mockCourseModel.findById.mockReturnValueOnce(null);
+
+      try {
+        await service.create(input);
+      } catch (error) {
+        expect(mockStudentModel.findById).toHaveBeenCalledWith('student1');
+        expect(mockCourseModel.findById).toHaveBeenCalledWith('course1');
+        expect(mockResultModel.prototype.save).not.toHaveBeenCalled();
+        expect(error).toBeInstanceOf(BadRequestException);
+      }
+    });
+  });
 
   describe('findAll', () => {
     it('should find all results and populate student and course', async () => {
