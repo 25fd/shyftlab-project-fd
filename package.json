@@ -73,9 +73,9 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
-  "husky": {
-      "hooks": {
-      "pre-commit": "npm run precommit"
-      }
+"husky": {
+    "hooks": {
+      "pre-commit": "yarn precommit"
+    }
   }
 }
