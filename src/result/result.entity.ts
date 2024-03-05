@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Student } from '../students/student.entity';
 import { Course } from '../course/course.entity';
-import { IsNotEmpty } from 'class-validator';
 
 export type ResultDocument = HydratedDocument<Result>;
 
@@ -21,18 +20,18 @@ export class Result {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
   })
-  @IsNotEmpty()
   student: Student;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
   })
-  @IsNotEmpty()
   course: Course;
 
-  @Prop()
-  @IsNotEmpty()
+  @Prop({
+    type: String,
+    enum: [Score.A, Score.B, Score.C, Score.D, Score.E, Score.F],
+  })
   score: Score;
 }
 

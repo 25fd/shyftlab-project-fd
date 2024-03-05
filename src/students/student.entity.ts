@@ -9,20 +9,37 @@ export type StudentDocument = HydratedDocument<Student>;
 export class Student {
 
 
-  @Prop()
+  @Prop(
+    {
+      required: true,
+      type: String
+    }
+  )
   firstName: string;
 
 
-  @Prop()
+  @Prop(
+    {
+      required: true,
+      type: String
+    }
+  )
   familyName: string;
 
 
   @Prop({
+    type: String,
+    required: true,
     unique: true
   })
   email: string;
 
-  @Prop()
+  @Prop(
+    {
+      required: true,
+      type: String
+    }
+  )
   dateOfBirth: string;
 }
 

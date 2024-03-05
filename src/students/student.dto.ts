@@ -1,7 +1,7 @@
 import { IsDate, IsEmail, IsNotEmpty } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class Student {
+export class StudentDto {
   @IsNotEmpty()
   firstName: string;
 

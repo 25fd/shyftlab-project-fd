@@ -2,7 +2,9 @@ import { Controller } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { Get, Post, Param, Delete, Body } from '@nestjs/common';
 import { CourseDto } from './course.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('courses')
 @Controller('courses')
 export class CourseController {
   constructor(private courseService: CourseService) {}

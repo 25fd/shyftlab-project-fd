@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { StudentController } from './student.controller';
 import { StudentService } from './student.service';
-import { Student } from './student.dto';
+import { Student } from './student.entity';
 
 import { Result, ResultSchema } from '../result/result.entity';
 

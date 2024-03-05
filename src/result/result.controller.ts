@@ -2,7 +2,9 @@ import { Controller } from '@nestjs/common';
 import { ResultService } from './result.service';
 import { Get, Post, Param, Delete, Body } from '@nestjs/common';
 import { ResultDto } from './result.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('results')
 @Controller('results')
 export class ResultController {
   constructor(private resultService: ResultService) {}

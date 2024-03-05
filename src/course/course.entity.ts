@@ -7,6 +7,8 @@ export type CourseDocument = HydratedDocument<Course>;
 export class Course {
   @Prop({
     unique: true,
+    required: true,
+    type: String,
   })
   courseName: string;
 }

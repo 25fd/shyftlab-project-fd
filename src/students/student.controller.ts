@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { Student } from './student.dto';
+import { StudentDto } from './student.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('students')
 @Controller('students')
 export class StudentController {
   constructor(private studentService: StudentService) {}
@@ -12,7 +14,7 @@ export class StudentController {
   }
 
   @Post()
-  async createStudent(@Body() student: Student) {
+  async createStudent(@Body() student: StudentDto) {
     return this.studentService.createStudent(student);
   }
 
