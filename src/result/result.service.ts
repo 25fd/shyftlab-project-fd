@@ -23,6 +23,18 @@ export class ResultService {
     if (!course) {
       throw new BadRequestException('Course not found');
     }
+
+    const resultExists = await this.resultModel.findOne({
+      student: result.student,
+      course: result.course,
+    });
+    if (resultExists) {
+      return this.resultModel.findOneAndUpdate(
+        { _id: resultExists._id },
+        { score: result.score },
+        { new: true },
+      );
+    }
     const createdResult = new this.resultModel(result);
     return createdResult.save();
   }

@@ -16,6 +16,7 @@ const course = { _id: 'course1', courseName: 'Math' };
 
 const mockResults = [
   {
+    _id: 'result1',
     student: student,
     course: course,
     score: 'A',
@@ -37,6 +38,8 @@ mockResultModel.find = jest.fn(() => ({
 mockResultModel.findById = jest.fn();
 mockResultModel.findByIdAndDelete = jest.fn();
 mockResultModel.prototype.save = jest.fn();
+mockResultModel.findOne = jest.fn();
+mockResultModel.findOneAndUpdate = jest.fn();
 
 const mockStudentModel = {
   findById: jest.fn(),
@@ -88,6 +91,7 @@ describe('ResultService', () => {
     it('should create a result', async () => {
       mockStudentModel.findById.mockReturnValueOnce(student);
       mockCourseModel.findById.mockReturnValueOnce(course);
+      mockResultModel.findOne.mockReturnValueOnce(null);
       mockResultModel.prototype.save.mockReturnValueOnce(mockResults[0]);
 
       const result = await service.create(input);
@@ -122,6 +126,30 @@ describe('ResultService', () => {
         expect(mockResultModel.prototype.save).not.toHaveBeenCalled();
         expect(error).toBeInstanceOf(BadRequestException);
       }
+    });
+    it('should update result if it exists', async () => {
+      const updatedInput = { ...input, score: 'A' };
+      const updatedResult = { ...mockResults[0], score: 'A' };
+
+      mockStudentModel.findById.mockReturnValueOnce(student);
+      mockCourseModel.findById.mockReturnValueOnce(course);
+      mockResultModel.findOne.mockReturnValueOnce(mockResults[0]);
+      mockResultModel.findOneAndUpdate.mockReturnValueOnce(updatedResult);
+
+      const result = await service.create(updatedInput);
+
+      expect(mockStudentModel.findById).toHaveBeenCalledWith('student1');
+      expect(mockCourseModel.findById).toHaveBeenCalledWith('course1');
+      expect(mockResultModel.findOne).toHaveBeenCalledWith({
+        student: 'student1',
+        course: 'course1',
+      });
+      expect(mockResultModel.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: mockResults[0]._id },
+        { score: 'A' },
+        { new: true },
+      );
+      expect(result).toEqual(updatedResult);
     });
   });
 

@@ -58,7 +58,7 @@ describe('CourseService', () => {
 
       expect(result).toEqual(course);
       expect(mockCourseModel.findOne).toHaveBeenCalledWith({
-        courseName: course.courseName,
+        courseName: { $regex: new RegExp('^' + course.courseName + '$', 'i') },
       });
       expect(mockCourseModel.prototype.save).toHaveBeenCalled();
     });

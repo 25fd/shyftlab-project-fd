@@ -13,7 +13,7 @@ export class CourseService {
 
   async create(course: Course): Promise<Course> {
     const courseExists = await this.courseModel.findOne({
-      courseName: course.courseName,
+      courseName: { $regex: new RegExp('^' + course.courseName + '$', 'i') },
     });
     if (courseExists) {
       throw new BadRequestException('Course already exists');
